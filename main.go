@@ -19,6 +19,7 @@ func NewNotificationProxy(to *url.URL) *httputil.ReverseProxy {
     query := req.URL.Query()
     messages := query["message"]
     services := query["service"]
+
     var service = "GENERIC"
     if len(services) > 0 {
       service = services[0]
@@ -29,12 +30,14 @@ func NewNotificationProxy(to *url.URL) *httputil.ReverseProxy {
       message = fmt.Sprintf("%s %s", message, messages[0])
     }
 
+    bodyString := fmt.Sprintf("{\"text\":\"%s\"}", message)
+    body := ioutil.NopCloser(bytes.NewBufferString(bodyString))
+
     req.URL = to
     req.Host = to.Host
+    req.Body = body
     req.Method = "POST"
-
-    bodyString := fmt.Sprintf("{\"text\":\"%s\"}", message)
-    req.Body = ioutil.NopCloser(bytes.NewBufferString(bodyString))
+    req.Header = http.Header{}
   }
 
   return &httputil.ReverseProxy{
