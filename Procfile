@@ -1,1 +1,1 @@
-web: main -from :$PORT -to $SLACK_HOST
+web: ./bin/src -from :$PORT -to $SLACK_URL
